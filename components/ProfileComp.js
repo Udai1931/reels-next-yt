@@ -1,22 +1,59 @@
-import React from 'react'
+import { doc, onSnapshot } from 'firebase/firestore'
+import React, { useContext, useEffect, useState } from 'react'
+import { AuthContext } from '../context/auth'
+import { db } from '../firebase'
 import Navbar from './Navbar'
 function ProfileComp() {
+
+    const { user } = useContext(AuthContext)
+    const [userData, setUserData] = useState({})
+    const [postIds,setPostIds] = useState([])
+    const [posts, setPosts] = useState([])
+
+    useEffect(() => {
+        console.log(user.uid)
+        const unsub = onSnapshot(doc(db, "users", user.uid), (doc) => {
+            console.log(doc.data());
+            setUserData(doc.data())
+            setPostIds(doc.data().posts)
+        })
+
+        return () => {
+            unsub();
+        }
+    }, [user])
+
+
+    useEffect(async () => {
+        let tempArray = []
+        postIds.map(async(postid,idx) => {
+            const unsub = onSnapshot(doc(db, "posts", postid), (doc) => {
+                // console.log(doc.data());
+                tempArray.push(doc.data())
+                console.log(tempArray)
+                setPosts([...tempArray])
+            })
+        })
+    }, [postIds])
+
     return (
         <div>
             <Navbar/>
             <div>
                 <div className='profile_upper'>
-                    <img src='https://firebasestorage.googleapis.com/v0/b/reels-next.appspot.com/o/pexels-mohamed-abdelghaffar-771742.jpg?alt=media&token=1e886354-24a7-458d-ba46-203c25eaaa20' style={{height:"8rem",width:"8rem",borderRadius:"50%"}}/>
+                    <img src={userData?.photoURL} style={{height:"8rem",width:"8rem",borderRadius:"50%"}}/>
                     <div style={{flexBasis:"40%"}}>
-                        <h1>Name</h1>
-                        <h3>Posts : 10</h3>
+                        <h1>{userData?.name}</h1>
+                        <h3>Posts : {userData?.posts?.length}</h3>
                     </div>
                 </div>
                 <hr/>
                 <div className='profile_videos'>
-                    <video src="https://firebasestorage.googleapis.com/v0/b/reels-next.appspot.com/o/posts%2F9ccfcb74-0c49-4291-94a8-204c519e8ba6?alt=media&token=b0d93373-17f6-4fb5-a043-34db03ba8b59"/>
-                    <video src="https://firebasestorage.googleapis.com/v0/b/reels-next.appspot.com/o/posts%2F9ccfcb74-0c49-4291-94a8-204c519e8ba6?alt=media&token=b0d93373-17f6-4fb5-a043-34db03ba8b59"/>
-                    <video src="https://firebasestorage.googleapis.com/v0/b/reels-next.appspot.com/o/posts%2F9ccfcb74-0c49-4291-94a8-204c519e8ba6?alt=media&token=b0d93373-17f6-4fb5-a043-34db03ba8b59"/>
+                    {
+                        posts.map((post)=>(
+                            <video src={post.postUrl}/>
+                        ))
+                    }
                 </div>
             </div>
         </div>

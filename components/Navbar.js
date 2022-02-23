@@ -17,13 +17,14 @@ import HomeIcon from '@mui/icons-material/Home';
 import ExploreIcon from '@mui/icons-material/Explore';
 import { AuthContext } from '../context/auth';
 import { Router, useRouter } from 'next/router';
+import Link from 'next/link';
 
 const pages = ['Products', 'Pricing', 'Blog'];
-const settings = ['Profile','Logout'];
+const settings = ['Profile', 'Logout'];
 
-const ResponsiveAppBar = () => {
-
-  const {logout} = React.useContext(AuthContext)
+const ResponsiveAppBar = ({ userData }) => {
+  console.log(userData)
+  const { logout } = React.useContext(AuthContext)
   const router = useRouter()
 
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -44,14 +45,14 @@ const ResponsiveAppBar = () => {
     setAnchorElUser(null);
   };
 
-  const handleLogout = async() => {
+  const handleLogout = async () => {
     await logout();
     console.log("Logged out!")
     router.push('/login')
   }
 
   return (
-    <AppBar position="static" className="navbar" style={{backgroundColor:"white"}}>
+    <AppBar position="static" className="navbar" style={{ backgroundColor: "white" }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Typography
@@ -60,20 +61,20 @@ const ResponsiveAppBar = () => {
             component="div"
             sx={{ mr: 2, display: { xs: 'flex', md: 'flex' } }}
           >
-            <Image src={insta} height={55} width={200}/>
+            <Image src={insta} height={55} width={200} />
           </Typography>
 
-          
+
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'flex' } }}>
-    
+
           </Box>
 
           <Box sx={{ flexGrow: 0 }} className="nav-icons-container">
-            <HomeIcon fontSize="large" className="nav-icons"/>
-            <ExploreIcon fontSize="large" className="nav-icons"/>
+            <HomeIcon fontSize="large" className="nav-icons" />
+            <ExploreIcon fontSize="large" className="nav-icons" />
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" sx={{margin:"0.5rem"}}/>
+                <Avatar alt="Remy Sharp" src={userData?.photoURL} sx={{ margin: "0.5rem" }} />
               </IconButton>
             </Tooltip>
             <Menu
@@ -93,14 +94,15 @@ const ResponsiveAppBar = () => {
               onClose={handleCloseUserMenu}
             >
               <MenuItem onClick={handleCloseUserMenu}>
+                <Link href="/profile">
                   <Typography textAlign="center">Profile</Typography>
-                </MenuItem>
-                <MenuItem onClick={()=>
-                {
-                  handleLogout()
-                }}>
-                  <Typography textAlign="center">Logout</Typography>
-                </MenuItem>
+                </Link>
+              </MenuItem>
+              <MenuItem onClick={() => {
+                handleLogout()
+              }}>
+                <Typography textAlign="center">Logout</Typography>
+              </MenuItem>
             </Menu>
           </Box>
         </Toolbar>

@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 
 function Profile() {
     const { user } = useContext(AuthContext)
-
+    console.log(user);
     const Redirect = () => {
         const router = useRouter()
         router.push('/login')
